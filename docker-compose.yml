@@ -1,8 +1,0 @@
-version: '3'
-services:
-  sad_challenge:
-    build: .
-    container_name: sad_challenge
-    ports:
-      - "8080:80"
-    restart: unless-stopped
