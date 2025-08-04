@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  fastapi:
+    build:
+      context: .
+    container_name: fastapi
+    expose:
+      - "8000"
+    networks:
+      - app-net
+
+  flag:
+    image: python:3.11-slim
+    container_name: flag
+    command: python3 -m http.server 1337 --directory /
+    volumes:
+      - ./flag.txt:/flag.txt
+    expose:
+      - "1337"
+    networks:
+      - internal-net
+
+  nginx:
+    image: nginx:1.29.0
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.template.conf:/etc/nginx/templates/nginx.template.conf
+      - ./nginx/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    depends_on:
+      - fastapi
+      - flag
+    networks:
+      - app-net
+      - internal-net
+
+networks:
+  app-net:
+  internal-net:
+    internal: true
